@@ -2,7 +2,8 @@
 	#Japanese
 	テーブルに指定した件数分ダミーデータを動的に追加します。「Require Input Parameters」に条件を指定してください。
 	データ追加中に主キー重複エラーが発生した場合は想定内エラーのため再度実行してください。
-	文字列（char、varchar、nchar、nvarchar）項目の最大文字列8000文字以上のSQL文の実行は出来ません。（項目の大きいテーブルが該当します。）
+	項目の多いテーブルはエラーになる可能性が非常に高いです。
+	（文字列（char、varchar、nchar、nvarchar）項目の最大文字列8000文字以上のSQL文の実行は出来ません。）
 
 	@DataAddCount：追加したいデータ件数
 	@TableName：追加したいテーブル名
@@ -11,7 +12,8 @@
 	#English Follow
 	Dynamically adds dummy data for the specified number of items to the table. Please specify the conditions in "Require Input Parameters".
 	If a primary key duplication error occurs while adding data, please try again as it is an expected error.
-	SQL statements with a string (char, varchar, nchar, nvarchar) item that has a maximum string of 8000 characters or more cannot be executed. (This applies to tables with large items.)
+	Tables with many items are highly prone to errors. 
+	(SQL statements with a string (char, varchar, nchar, nvarchar) item with a maximum string of 8000 characters or more cannot be executed.)
 
 	@DataAddCount: Number of data items you want to add
 	@TableName: table name you want to add
