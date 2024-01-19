@@ -18,9 +18,9 @@
 BEGIN TRANSACTION
 
 -- Require Input Parameters
-DECLARE @DataAddCount AS bigint = 3
-DECLARE @TableName AS varchar(255) = 'TableName'
-DECLARE @TestFlg AS int = 0
+DECLARE @DataAddCount AS bigint = 10
+DECLARE @TableName AS varchar(255) = 'Product'
+DECLARE @TestFlg AS int = 1
 -- Require Input Parameters
 
 DECLARE @TableDtName AS varchar(255) = @TableName + '_Dt'
@@ -44,6 +44,7 @@ DECLARE @TmpTbl AS table
 	val_scale int null
 )
 
+EXEC('DROP TABLE IF EXISTS ' + @TableDtName)
 EXEC('SELECT TOP 0 * INTO ' + @TableDtName + ' FROM ' + @TableName)
 DECLARE cs CURSOR LOCAL FOR 
 SELECT
