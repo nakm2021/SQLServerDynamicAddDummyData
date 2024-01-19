@@ -1,19 +1,15 @@
-/*
+﻿/*
 	#Japanese
-	�e�[�u���Ɏw�肵���������_�~�[�f�[�^�𓮓I�ɒǉ����܂��B�uRequire Input Parameters�v�ɏ������w�肵�Ă��������B
-	�f�[�^�ǉ����Ɏ�L�[�d���G���[�����������ꍇ�͑z����G���[�̂��ߍēx���s���Ă��������B
-	���ڂ̑����e�[�u���̓G���[�ɂȂ�\�������ɍ����ł��B
-	�i������ichar�Avarchar�Anchar�Anvarchar�j���ڂ̍ő啶����8000�����ȏ��SQL���̎��s�͏o���܂���B�j
+	テーブルに指定した件数分ダミーデータを動的に追加します。「Require Input Parameters」に条件を指定してください。
+	データ追加中に主キー重複エラーが発生した場合は想定内エラーのため再度実行してください。
 
-	@DataAddCount�F�ǉ��������f�[�^����
-	@TableName�F�ǉ��������e�[�u����
-	@TestFlg�F����m�F�t���O�B���s�̊m�F�ɂ́u0�v�A�f�[�^�ǉ������ۂɍs�������ꍇ�́A�u1�v��ݒ�
+	@DataAddCount：追加したいデータ件数
+	@TableName：追加したいテーブル名
+	@TestFlg：動作確認フラグ。実行の確認には「0」、データ追加を実際に行いたい場合は、「1」を設定
 
 	#English Follow
 	Dynamically adds dummy data for the specified number of items to the table. Please specify the conditions in "Require Input Parameters".
 	If a primary key duplication error occurs while adding data, please try again as it is an expected error.
-	Tables with many items are highly prone to errors. 
-	(SQL statements with a string (char, varchar, nchar, nvarchar) item with a maximum string of 8000 characters or more cannot be executed.)
 
 	@DataAddCount: Number of data items you want to add
 	@TableName: table name you want to add
@@ -36,8 +32,9 @@ DECLARE @val_precision AS int = 0
 DECLARE @val_scale AS int = 0
 DECLARE @i AS bigint = 0
 DECLARE @ExecCmd AS varchar(max) = ''
-DECLARE @CharSet AS varchar(255) = '''ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_'''
+DECLARE @CharSet AS varchar(255) = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_'
 DECLARE @CharCount AS int = 0
+DECLARE @Char AS varchar = ''
 DECLARE @TmpTbl AS table
 (
 	val_name varchar(255) null,
@@ -105,18 +102,24 @@ BEGIN
 			IF @val_max_length = -1
 			BEGIN
 				SET @CharCount = 1
-				SET @ExecCmd = @ExecCmd + 'SUBSTRING(' + @CharSet + ',CONVERT(int,CEILING(RAND() * ' + STR(LEN(@CharSet)) + ')),255)'
+				SELECT @Char = SUBSTRING(@CharSet,CONVERT(int,CEILING(RAND() * LEN(@CharSet))),255)
+				SET @ExecCmd = @ExecCmd + @Char
 			END
 			IF @val_max_length <> -1
 			BEGIN
+				SET @ExecCmd = @ExecCmd + ''''
+				IF @val_user_type_id = 'nchar' OR @val_user_type_id = 'nvarchar'
+					SET @val_max_length = ROUND(@val_max_length / 2,0)
 				WHILE @CharCount < @val_max_length - 1
 				BEGIN
 					SET @CharCount = @CharCount + 1
-					SET @ExecCmd = @ExecCmd + 'SUBSTRING(' + @CharSet + ',CONVERT(int,CEILING(RAND() * ' + STR(LEN(@CharSet)) + ')),1) + '
+					SELECT @Char = SUBSTRING(@CharSet,CONVERT(int,CEILING(RAND() * LEN(@CharSet))),1)
+					SET @ExecCmd = @ExecCmd + @Char
 				END
 				BEGIN
 					SET @CharCount = 1
-					SET @ExecCmd = @ExecCmd + 'SUBSTRING(' + @CharSet + ',CONVERT(int,CEILING(RAND() * ' + STR(LEN(@CharSet)) + ')),1)'
+					SELECT @Char = SUBSTRING(@CharSet,CONVERT(int,CEILING(RAND() * LEN(@CharSet))),1)
+					SET @ExecCmd = @ExecCmd + @Char + ''''
 				END
 			END
 		END
@@ -185,11 +188,21 @@ BEGIN CATCH
 	PRINT 'ERROR_SEVERITY : ' + STR(ERROR_SEVERITY())
 	PRINT 'ERROR_STATE : ' + STR(ERROR_STATE())
 	PRINT 'ERROR_MESSAGE : ' + ERROR_MESSAGE()
+	ROLLBACK TRANSACTION
 END CATCH
 IF @TestFlg = 0
 	ROLLBACK TRANSACTION
 IF @TestFlg = 1
 BEGIN
 	EXEC('DROP TABLE ' + @TableDtName)
+	PRINT '                                                                         '
+	PRINT ' ■■■■      ■     ■      ■■■■       ■■■■      ■■■■■      ■■■■       ■■■■  '
+	PRINT ' ■   ■     ■     ■     ■   ■■     ■   ■■     ■          ■   ■      ■   ■ '
+	PRINT ' ■         ■     ■    ■          ■           ■          ■          ■     '
+	PRINT '  ■■■      ■     ■    ■          ■           ■■■■■       ■■■        ■■■  '
+	PRINT '     ■     ■     ■    ■          ■           ■              ■          ■ '
+	PRINT '　■   ■　    ■■   ■■    ■     ■    ■     ■     ■         ■■   ■　    　■   ■　'
+	PRINT ' ■   ■      ■   ■      ■   ■      ■   ■      ■■■■■■     ■   ■      ■   ■ '
+	PRINT '  ■■■■       ■■■        ■■■        ■■■                   ■■■■       ■■■■ '
 	COMMIT TRANSACTION
 END
