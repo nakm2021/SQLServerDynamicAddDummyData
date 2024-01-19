@@ -32,7 +32,7 @@ DECLARE @val_precision AS int = 0
 DECLARE @val_scale AS int = 0
 DECLARE @i AS bigint = 0
 DECLARE @ExecCmd AS varchar(max) = ''
-DECLARE @CharSet AS varchar(255) = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_'
+DECLARE @CharSet AS varchar(255) = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮ'
 DECLARE @CharCount AS int = 0
 DECLARE @Char AS varchar = ''
 DECLARE @TmpTbl AS table
