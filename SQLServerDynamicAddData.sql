@@ -127,7 +127,7 @@ BEGIN
 			SET @ExecCmd = @ExecCmd + 'GETDATE()'
 		IF @val_user_type_id = 'datetimeoffset'
 			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS datetimeoffset)'
-		IF @val_user_type_id = 'decimal'
+		IF @val_user_type_id = 'decimal' OR @val_user_type_id = 'numeric'
 			IF @val_precision = 0 AND @val_scale = 0
 				SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999999999999 AS decimal)'
 			ELSE
@@ -160,6 +160,26 @@ BEGIN
 			SET @ExecCmd = @ExecCmd + 'CAST(NULL AS uniqueidentifier)'
 		IF @val_user_type_id = 'varbinary'
 			SET @ExecCmd = @ExecCmd + 'CAST(NULL AS varbinary)'
+		IF @val_user_type_id = 'money'
+			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 922337203685477.5806  AS money)'
+		IF @val_user_type_id = 'smallmoney'
+			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 214748.3646 AS smallmoney)'
+		IF @val_user_type_id = 'real'
+			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999.9999 AS real)'
+		IF @val_user_type_id = 'date'
+			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS date)'
+		IF @val_user_type_id = 'datetime2'
+			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS datetime2)'
+		IF @val_user_type_id = 'smalldatetime'
+			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS smalldatetime)'
+		IF @val_user_type_id = 'time'
+			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS time)'
+		IF @val_user_type_id = 'timestamp'
+			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS timestamp)'
+		IF @val_user_type_id = 'text'
+			SET @ExecCmd = @ExecCmd + 'CAST(NULL AS text)'
+		IF @val_user_type_id = 'ntext'
+			SET @ExecCmd = @ExecCmd + 'CAST(NULL AS ntext)'
 		FETCH NEXT FROM cs
 		INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
 	END
