@@ -159,10 +159,9 @@ BEGIN
 	SET @ExecCmd = @ExecCmd + ')'
 	CLOSE cs
 	DEALLOCATE cs
-	PRINT @ExecCmd
 	EXEC(@ExecCmd)
 	PRINT @i
-	
+	PRINT @ExecCmd
 END
 
 BEGIN TRY
@@ -179,14 +178,8 @@ BEGIN CATCH
 END CATCH
 IF @TestFlg = 0
 	ROLLBACK TRANSACTION
-ELSE
+IF @TestFlg = 1
 BEGIN
-	IF @TestFlg = 1
-	BEGIN
-		IF @@ERROR <> 0
-		BEGIN
-		EXEC('DROP TABLE ' + @TableDtName)
-		COMMIT TRANSACTION
-		END
-	END
+	EXEC('DROP TABLE ' + @TableDtName)
+	COMMIT TRANSACTION
 END
