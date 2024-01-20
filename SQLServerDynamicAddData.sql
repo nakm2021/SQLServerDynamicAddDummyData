@@ -18,18 +18,18 @@
 BEGIN TRANSACTION
 
 -- Require Input Parameters
-DECLARE @DataAddCount AS bigint = 10
-DECLARE @TableName AS varchar(255) = 'MST_Order'
+DECLARE @DataAddCount AS bigint = 100
+DECLARE @TableName AS varchar(255) = 'MST_Customer'
 DECLARE @TestFlg AS int = 1
 -- Require Input Parameters
 
-DECLARE @TableDtName AS varchar(255) = @TableName + '_Dt'
 DECLARE @val_name AS varchar(255) = ''
 DECLARE @val_column_id AS int = 0
 DECLARE @val_user_type_id AS varchar(255) = ''
 DECLARE @val_max_length int = 0
 DECLARE @val_precision AS int = 0
 DECLARE @val_scale AS int = 0
+DECLARE @val_is_identity AS int = 0
 DECLARE @i AS bigint = 0
 DECLARE @ExecCmd AS varchar(max) = ''
 DECLARE @CharSet AS varchar(255) = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮ'
@@ -43,11 +43,9 @@ DECLARE @TmpTbl AS table
 	val_user_type_id varchar(255) null,
 	val_max_length int null,
 	val_precision int null,
-	val_scale int null
+	val_scale int null,
+	val_is_identity int null
 )
-
-EXEC('DROP TABLE IF EXISTS ' + @TableDtName)
-EXEC('SELECT TOP 0 * INTO ' + @TableDtName + ' FROM ' + @TableName)
 DECLARE cs CURSOR LOCAL FOR 
 SELECT
 	C.name,
@@ -55,7 +53,8 @@ SELECT
 	TYPE_NAME(C.user_type_id) AS user_type_id,
 	C.max_length,
 	C.precision,
-	C.scale
+	C.scale,
+	C.is_identity
 FROM sys.tables T
 INNER JOIN sys.columns C
 ON T.object_id = C.object_id
@@ -63,13 +62,13 @@ WHERE T.name = @TableName
 ORDER BY C.column_id
 OPEN cs
 FETCH NEXT FROM cs
-INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
+INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
 WHILE @@FETCH_STATUS = 0
 BEGIN
 	INSERT INTO @TmpTbl
-	SELECT @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
+	SELECT @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
 	FETCH NEXT FROM cs 
-	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
+	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
 END
 CLOSE cs
 DEALLOCATE cs
@@ -79,16 +78,23 @@ BEGIN
 	SET @i = @i + 1
 	DECLARE cs CURSOR LOCAL FOR
 	SELECT
-	val_name,val_column_id,val_user_type_id,val_max_length,val_precision,val_scale
+	val_name,val_column_id,val_user_type_id,val_max_length,val_precision,val_scale,val_is_identity
 	FROM @TmpTbl
 	ORDER BY val_column_id
 	OPEN cs
 	FETCH NEXT FROM cs
-	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
+	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
 		IF @val_column_id = 1
-			SET @ExecCmd = 'INSERT INTO ' + @TableDtName + ' VALUES('
+		BEGIN
+			SET @ExecCmd = 'INSERT INTO ' + @TableName + ' VALUES('
+			IF @val_is_identity = 1
+			BEGIN
+				FETCH NEXT FROM cs
+				INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+			END
+		END
 		ELSE
 			SET @ExecCmd = @ExecCmd + ','
 
@@ -188,7 +194,7 @@ BEGIN
 		IF @val_user_type_id = 'ntext'
 			SET @ExecCmd = @ExecCmd + 'CAST(NULL AS ntext)'
 		FETCH NEXT FROM cs
-		INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale
+		INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
 	END
 	SET @ExecCmd = @ExecCmd + ')'
 	CLOSE cs
@@ -205,23 +211,10 @@ BEGIN
 	PRINT @i
 	PRINT @ExecCmd
 END
-
-BEGIN TRY
-	EXEC('INSERT INTO ' + @TableName + ' SELECT * FROM ' + @TableDtName)
-	EXEC('SELECT * FROM ' + @TableDtName)
-END TRY
-BEGIN CATCH
-	PRINT 'ERROR_NUMBER : ' + STR(ERROR_NUMBER())
-	PRINT 'ERROR_SEVERITY : ' + STR(ERROR_SEVERITY())
-	PRINT 'ERROR_STATE : ' + STR(ERROR_STATE())
-	PRINT 'ERROR_MESSAGE : ' + ERROR_MESSAGE()
-	ROLLBACK TRANSACTION
-END CATCH
 IF @TestFlg = 0
 	ROLLBACK TRANSACTION
 IF @TestFlg = 1
 BEGIN
-	EXEC('DROP TABLE ' + @TableDtName)
 	PRINT '                                                                         '
 	PRINT ' ■■■■      ■     ■      ■■■■       ■■■■      ■■■■■      ■■■■       ■■■■  '
 	PRINT ' ■   ■     ■     ■     ■   ■■     ■   ■■     ■          ■   ■      ■   ■ '
