@@ -14,3 +14,5 @@
 ## 	@DataAddCount: Number of data items you want to add
 ## 	@TableName: table name you want to add
 ## 	@TestFlg: Operation check flag. Set "0" to confirm execution, and "1" if you want to actually add data.
+### サンプル実行結果 - Sample Execution Results
+![SampleResult](https://github.com/nakm2021/SQLServerDynamicAddData/assets/79841952/f681eaa5-9021-458a-ba34-52463622d64b)
