@@ -97,7 +97,11 @@ BEGIN
 		END
 		ELSE
 			SET @ExecCmd = @ExecCmd + ','
-
+		IF @val_is_identity = 1
+		BEGIN
+			FETCH NEXT FROM cs
+			INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+		END
 		IF @val_user_type_id = 'bigint'
 			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999999999999999 AS bigint)'
 		IF @val_user_type_id = 'binary'
