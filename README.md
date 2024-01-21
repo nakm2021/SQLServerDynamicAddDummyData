@@ -1,6 +1,6 @@
 # SQLServerのテーブルに自動的にダミーデータを追加します。
 ## サンプル実行結果 - Sample Execution Results
-![SampleResult](https://github.com/nakm2021/SQLServerDynamicAddDummyData/assets/79841952/b9134703-badd-455a-bb66-7f815138c4a8)
+![SampleResult](https://github.com/nakm2021/SQLServerDynamicAddDummyData/assets/79841952/8a8e2e10-57ff-433f-b23f-380228854eb7)
 ### ＊＊＊Japanese＊＊＊
 ### まずは、「SQLServerDynamicAddDummyData.sql」をSSMS（SqlServerManagementStudio）で開いて下さい。
 ### テーブルに指定した件数分ダミーデータを動的に追加します。「Require Input Parameters」に条件を指定してください。
