@@ -14,6 +14,8 @@
 	@DataAddCount: Number of data items you want to add
 	@TableName: table name you want to add
 	@TestFlg: Operation check flag. Set "0" to confirm execution, and "1" if you want to actually add data.
+
+	Copyright (c) 2024/1/21 Nakamoto Masakuni
 */
 BEGIN TRANSACTION
 
