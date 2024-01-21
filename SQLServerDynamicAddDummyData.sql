@@ -32,6 +32,7 @@ DECLARE @val_max_length int = 0
 DECLARE @val_precision AS int = 0
 DECLARE @val_scale AS int = 0
 DECLARE @val_is_identity AS int = 0
+DECLARE @val_is_nullable AS int = 0
 DECLARE @i AS bigint = 0
 DECLARE @ExecCmd AS varchar(max) = ''
 DECLARE @CharSet AS varchar(255) = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!"#$%&()-=^~\|@`[{;+:*]},<.>/?_ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮ'
@@ -46,7 +47,8 @@ DECLARE @TmpTbl AS table
 	val_max_length int null,
 	val_precision int null,
 	val_scale int null,
-	val_is_identity int null
+	val_is_identity int null,
+	val_is_nullable int null
 )
 DECLARE cs CURSOR LOCAL FOR 
 SELECT
@@ -56,7 +58,8 @@ SELECT
 	C.max_length,
 	C.precision,
 	C.scale,
-	C.is_identity
+	C.is_identity,
+	C.is_nullable
 FROM sys.tables T
 INNER JOIN sys.columns C
 ON T.object_id = C.object_id
@@ -64,13 +67,13 @@ WHERE T.name = @TableName
 ORDER BY C.column_id
 OPEN cs
 FETCH NEXT FROM cs
-INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 WHILE @@FETCH_STATUS = 0
 BEGIN
 	INSERT INTO @TmpTbl
-	SELECT @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+	SELECT @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 	FETCH NEXT FROM cs 
-	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 END
 CLOSE cs
 DEALLOCATE cs
@@ -80,12 +83,12 @@ BEGIN
 	SET @i = @i + 1
 	DECLARE cs CURSOR LOCAL FOR
 	SELECT
-	val_name,val_column_id,val_user_type_id,val_max_length,val_precision,val_scale,val_is_identity
+	val_name,val_column_id,val_user_type_id,val_max_length,val_precision,val_scale,val_is_identity,val_is_nullable
 	FROM @TmpTbl
 	ORDER BY val_column_id
 	OPEN cs
 	FETCH NEXT FROM cs
-	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+	INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 	WHILE @@FETCH_STATUS = 0
 	BEGIN
 		IF @val_column_id = 1
@@ -94,7 +97,7 @@ BEGIN
 			IF @val_is_identity = 1
 			BEGIN
 				FETCH NEXT FROM cs
-				INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+				INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 			END
 		END
 		ELSE
@@ -102,7 +105,7 @@ BEGIN
 		IF @val_is_identity = 1
 		BEGIN
 			FETCH NEXT FROM cs
-			INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+			INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 		END
 		IF @val_user_type_id = 'bigint'
 			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999999999999999 AS bigint)'
@@ -199,8 +202,21 @@ BEGIN
 			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS text)'
 		IF @val_user_type_id = 'ntext'
 			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS ntext)'
+		IF @val_user_type_id = 'geography'
+			SET @ExecCmd = @ExecCmd + 'geography::Point(CAST(RAND() * 90 AS float),CAST(RAND() * 90 AS float), (SELECT TOP 1 spatial_reference_id FROM sys.spatial_reference_systems))'
+		IF @val_user_type_id = 'geometry'
+			SET @ExecCmd = @ExecCmd + 'geometry::STGeomFromText(''POLYGON ((0 0, ' + CAST(CAST(RAND() * 150 AS int) AS varchar) + ' 0, ' + CAST(CAST(RAND() * 150 AS int) AS varchar) + ' 150, 0 150, 0 0))'', RAND() * 9999)'
+		IF @val_user_type_id = 'hierarchyid'
+			SET @ExecCmd = @ExecCmd + 'CAST(''/''+ CAST(CAST(RAND() * 99 AS int) AS varchar) + ''/'' + CAST(CAST(RAND() * 99 AS int) AS varchar) + ''/'' AS hierarchyid)'
+		IF @val_user_type_id = 'xml'
+		BEGIN
+			IF @val_is_nullable <> 1
+				RAISERROR (15600, -1, -1, 'データ型xml型はNULL許容型に変更してください。(Change the data type xml type to a nullable type.)');
+			ELSE
+				SET @ExecCmd = @ExecCmd + 'NULL'
+		END
 		FETCH NEXT FROM cs
-		INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity
+		INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 	END
 	SET @ExecCmd = @ExecCmd + ')'
 	CLOSE cs
