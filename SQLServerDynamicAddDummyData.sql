@@ -222,16 +222,25 @@ BEGIN
 	CLOSE cs
 	DEALLOCATE cs
 	BEGIN TRY
-		EXEC(@ExecCmd)
+		BEGIN TRANSACTION
+			EXEC(@ExecCmd)
+		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
 		PRINT 'ERROR_NUMBER : ' + STR(ERROR_NUMBER())
 		PRINT 'ERROR_SEVERITY : ' + STR(ERROR_SEVERITY())
 		PRINT 'ERROR_STATE : ' + STR(ERROR_STATE())
 		PRINT 'ERROR_MESSAGE : ' + ERROR_MESSAGE()
+		PRINT N'--- 実行SQL文 (Executable SQL Statement) ---'
+		PRINT @ExecCmd
+		PRINT N'--------------------------------------------'
+		ROLLBACK TRANSACTION;
+		THROW;
 	END CATCH
+	PRINT N'--- 処理件数と実行SQL文 (Processing count and execution SQL statement) ---'
 	PRINT @i
 	PRINT @ExecCmd
+	PRINT N'--------------------------------------------------------------------------'
 END
 IF @TestFlg = 0
 	ROLLBACK TRANSACTION
