@@ -175,7 +175,8 @@ BEGIN
 			END
 		END
 		IF @val_user_type_id = 'datetime'
-			SET @ExecCmd = @ExecCmd + 'GETDATE()'
+			SET @ExecCmd = @ExecCmd + 'DATETIMEFROMPARTS(CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),CAST(FLOOR(RAND() * 11) + 1 AS varchar),CAST(FLOOR(RAND() * 27) + 1 AS varchar),CAST(FLOOR(RAND() * 24) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 997) AS varchar))'
+
 		IF @val_user_type_id = 'datetimeoffset'
 			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS datetimeoffset)'
 		IF @val_user_type_id = 'decimal' OR @val_user_type_id = 'numeric'
