@@ -175,9 +175,26 @@ BEGIN
 			END
 		END
 		IF @val_user_type_id = 'datetime'
-			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATETIMEFROMPARTS(CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),CAST(FLOOR(RAND() * 11) + 1 AS varchar),CAST(FLOOR(RAND() * 27) + 1 AS varchar),CAST(FLOOR(RAND() * 24) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 997) AS varchar)) ,'yyyy/MM/dd HH:mm:sss') + ''''
+			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATETIMEFROMPARTS(
+																	CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
+																	CAST(FLOOR(RAND() * 11) + 1 AS varchar),
+																	CAST(FLOOR(RAND() * 27) + 1 AS varchar),
+																	CAST(FLOOR(RAND() * 24) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),
+																	CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 997) AS varchar)
+																	) ,'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'datetimeoffset'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS datetimeoffset)'
+			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATETIMEOFFSETFROMPARTS(
+											CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
+											CAST(FLOOR(RAND() * 11) + 1 AS varchar),
+											CAST(FLOOR(RAND() * 27) + 1 AS varchar),
+											CAST(FLOOR(RAND() * 24) AS varchar),
+											CAST(FLOOR(RAND() * 60) AS varchar),
+											CAST(FLOOR(RAND() * 60) AS varchar),
+											CAST(FLOOR(RAND() * 997) AS varchar),
+											0,
+											0,
+											7
+											) ,'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'decimal' OR @val_user_type_id = 'numeric'
 			IF @val_precision = 0 AND @val_scale = 0
 				SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999999999999 AS decimal)'
@@ -218,15 +235,40 @@ BEGIN
 		IF @val_user_type_id = 'real'
 			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999.9999 AS real)'
 		IF @val_user_type_id = 'date'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS date)'
+			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATEFROMPARTS(
+								CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 11) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 27) + 1 AS varchar)
+								), 'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'datetime2'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS datetime2)'
+			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATETIME2FROMPARTS(
+								CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 11) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 27) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 24) AS varchar),
+								CAST(FLOOR(RAND() * 60) AS varchar),
+								CAST(FLOOR(RAND() * 60) AS varchar),
+								CAST(FLOOR(RAND() * 997) AS varchar),
+								7
+								), 'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'smalldatetime'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS smalldatetime)'
+			SET @ExecCmd = @ExecCmd + '''' + FORMAT(SMALLDATETIMEFROMPARTS(
+								CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1901 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 11) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 27) + 1 AS varchar),
+								CAST(FLOOR(RAND() * 24) AS varchar),
+								CAST(FLOOR(RAND() * 60) AS varchar)
+								),'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'time'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS time)'
+			SET @ExecCmd = @ExecCmd + '''' + CAST(TIMEFROMPARTS(
+							CAST(FLOOR(RAND() * 24) AS varchar),
+							CAST(FLOOR(RAND() * 60) AS varchar),
+							CAST(FLOOR(RAND() * 60) AS varchar),
+							0,
+							7
+							) AS varchar) + ''''
 		IF @val_user_type_id = 'timestamp'
-			SET @ExecCmd = @ExecCmd + 'CAST(GETDATE() AS timestamp)'
+			SET @ExecCmd = @ExecCmd + 'NULL'
 		IF @val_user_type_id = 'text'
 			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS text)'
 		IF @val_user_type_id = 'ntext'
