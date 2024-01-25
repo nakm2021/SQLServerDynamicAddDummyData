@@ -175,13 +175,13 @@ BEGIN
 			ELSE
 			BEGIN
 				IF @val_scale = 0
-					SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + CAST(REPLICATE(9,@val_precision) AS varchar) + ' AS decimal(' + STR(@val_precision) + ',' + STR(@val_scale) + '))'
+					SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + CAST(REPLICATE(9,@val_precision) AS varchar) + ' AS decimal(' + CAST(@val_precision AS varchar) + ',' + CAST(@val_scale AS varchar) + '))'
 				ELSE
 				BEGIN
 					IF @val_precision <= 9
-						SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + STR(@val_precision) + ' AS decimal(' + STR(@val_precision) + ',' + STR(@val_scale) + '))'
+						SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + CAST(@val_precision AS varchar) + ' AS decimal(' + CAST(@val_precision AS varchar) + ',' + CAST(@val_scale AS varchar) + '))'
 					ELSE
-						SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 9999 AS decimal(' + STR(@val_precision) + ',' + STR(@val_scale) + '))'
+						SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 9999 AS decimal(' + CAST(@val_precision AS varchar) + ',' + CAST(@val_scale AS varchar) + '))'
 				END
 			END
 		IF @val_user_type_id = 'float'
@@ -247,10 +247,10 @@ BEGIN
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH
-		PRINT 'ERROR_NUMBER : ' + STR(ERROR_NUMBER())
-		PRINT 'ERROR_SEVERITY : ' + STR(ERROR_SEVERITY())
-		PRINT 'ERROR_STATE : ' + STR(ERROR_STATE())
-		PRINT 'ERROR_MESSAGE : ' + ERROR_MESSAGE()
+		PRINT 'ERROR_NUMBER : ' + CAST(ERROR_NUMBER() AS varchar)
+		PRINT 'ERROR_SEVERITY : ' + CAST(ERROR_SEVERITY() AS varchar)
+		PRINT 'ERROR_STATE : ' + CAST(ERROR_STATE() AS varchar)
+		PRINT 'ERROR_MESSAGE : ' + CAST(ERROR_MESSAGE() AS varchar)
 		PRINT N'--- 実行SQL文 (Executable SQL Statement) ---'
 		PRINT @ExecCmd
 		PRINT N'--------------------------------------------'
