@@ -41,7 +41,7 @@ BEGIN TRANSACTION
 
 -- Require Input Parameters
 DECLARE @DataAddCount AS bigint = 100
-DECLARE @TableName AS varchar(255) = 'MST_Customer'
+DECLARE @TableName AS varchar(255) = 'TableName'
 DECLARE @TestFlg AS int = 1
 -- Require Input Parameters
 
@@ -175,7 +175,7 @@ BEGIN
 			ELSE
 			BEGIN
 				IF @val_scale = 0
-					SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + STR(@val_precision) + 'AS decimal(' + STR(@val_precision) + ',' + STR(@val_scale) + '))'
+					SET @ExecCmd = @ExecCmd + 'CAST(RAND() * ' + CAST(REPLICATE(9,@val_precision) AS varchar) + ' AS decimal(' + STR(@val_precision) + ',' + STR(@val_scale) + '))'
 				ELSE
 				BEGIN
 					IF @val_precision <= 9
