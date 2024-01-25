@@ -41,7 +41,7 @@ BEGIN TRANSACTION
 
 -- Require Input Parameters
 DECLARE @DataAddCount AS bigint = 100
-DECLARE @TableName AS varchar(255) = 'TableName'
+DECLARE @TableName AS varchar(255) = 'TMP_DateTbl'--TableName
 DECLARE @TestFlg AS int = 1
 -- Require Input Parameters
 
@@ -128,9 +128,10 @@ BEGIN
 			INTO @val_name,@val_column_id,@val_user_type_id,@val_max_length,@val_precision,@val_scale,@val_is_identity,@val_is_nullable
 		END
 		IF @val_user_type_id = 'bigint'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999999999999999 AS bigint)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 999999999999999999 AS bigint) AS varchar)
 		IF @val_user_type_id = 'binary'
 			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 99999 AS binary)'
+
 		IF @val_user_type_id = 'bit'
 			SET @ExecCmd = @ExecCmd + 'CAST(0 AS bit)'
 		IF @val_user_type_id = 'char' OR @val_user_type_id = 'nchar' OR @val_user_type_id = 'nvarchar' OR @val_user_type_id = 'varchar'
@@ -211,29 +212,29 @@ BEGIN
 				END
 			END
 		IF @val_user_type_id = 'float'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 9999 AS float)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 9999 AS float) AS varchar)
 		IF @val_user_type_id = 'image'
 			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS image)'
 		IF @val_user_type_id = 'int'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 2147483646 AS int)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 2147483646 AS int) AS varchar)
 		IF @val_user_type_id = 'smallint'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 32766 AS smallint)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 32766 AS smallint) AS varchar)
 		IF @val_user_type_id = 'sql_variant'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 9999999999999 AS sql_variant)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 9999999999999 AS sql_variant) AS varchar)
 		IF @val_user_type_id = 'sysname'
 			SET @ExecCmd = @ExecCmd + 'TYPE_NAME(1)'
 		IF @val_user_type_id = 'tinyint'
-			SET @ExecCmd = @ExecCmd + 'CAST(FLOOR(RAND() * 9) AS tinyint)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(FLOOR(RAND() * 9) AS tinyint) AS varchar)
 		IF @val_user_type_id = 'uniqueidentifier'
-			SET @ExecCmd = @ExecCmd + 'NEWID()'
+			SET @ExecCmd = @ExecCmd + '''' + CAST(NEWID() AS varchar(255)) + ''''
 		IF @val_user_type_id = 'varbinary'
 			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS varbinary)'
 		IF @val_user_type_id = 'money'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 922337203685477.5806  AS money)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 922337203685477.5806  AS money) AS varchar)
 		IF @val_user_type_id = 'smallmoney'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 214748.3646 AS smallmoney)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 214748.3646 AS smallmoney) AS varchar)
 		IF @val_user_type_id = 'real'
-			SET @ExecCmd = @ExecCmd + 'CAST(RAND() * 999999.9999 AS real)'
+			SET @ExecCmd = @ExecCmd + CAST(CAST(RAND() * 999999.9999 AS real) AS varchar)
 		IF @val_user_type_id = 'date'
 			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATEFROMPARTS(
 								CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
@@ -270,9 +271,9 @@ BEGIN
 		IF @val_user_type_id = 'timestamp'
 			SET @ExecCmd = @ExecCmd + 'NULL'
 		IF @val_user_type_id = 'text'
-			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS text)'
+			SET @ExecCmd = @ExecCmd + '''' + CAST(CAST(CAST(RAND() * 9999 AS varchar) AS text) AS varchar) + ''''
 		IF @val_user_type_id = 'ntext'
-			SET @ExecCmd = @ExecCmd + 'CAST(CAST(RAND() * 9999 AS varchar) AS ntext)'
+			SET @ExecCmd = @ExecCmd + '''' + CAST(CAST(CAST(RAND() * 9999 AS varchar) AS ntext) AS varchar) + ''''
 		IF @val_user_type_id = 'geography'
 			SET @ExecCmd = @ExecCmd + 'geography::Point(CAST(RAND() * 90 AS float),CAST(RAND() * 90 AS float), (SELECT TOP 1 spatial_reference_id FROM sys.spatial_reference_systems))'
 		IF @val_user_type_id = 'geometry'
