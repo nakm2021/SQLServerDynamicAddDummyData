@@ -41,7 +41,7 @@ BEGIN TRANSACTION
 
 -- Require Input Parameters
 DECLARE @DataAddCount AS bigint = 100
-DECLARE @TableName AS varchar(255) = 'TMP_DateTbl'--TableName
+DECLARE @TableName AS varchar(255) = 'TableName'
 DECLARE @TestFlg AS int = 1
 -- Require Input Parameters
 
