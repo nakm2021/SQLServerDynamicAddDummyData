@@ -180,8 +180,10 @@ BEGIN
 																	CAST(FLOOR(YEAR(GETDATE()) + (RAND() * (1752 - YEAR(GETDATE() + 1)))) + 1 AS varchar),
 																	CAST(FLOOR(RAND() * 11) + 1 AS varchar),
 																	CAST(FLOOR(RAND() * 27) + 1 AS varchar),
-																	CAST(FLOOR(RAND() * 24) AS varchar),CAST(FLOOR(RAND() * 60) AS varchar),
-																	CAST(FLOOR(RAND() * 60) AS varchar),CAST(FLOOR(RAND() * 997) AS varchar)
+																	CAST(FLOOR(RAND() * 24) AS varchar),
+																	CAST(FLOOR(RAND() * 60) AS varchar),
+																	CAST(FLOOR(RAND() * 60) AS varchar),
+																	CAST(FLOOR(RAND() * 997) AS varchar)
 																	) ,'yyyy/MM/dd HH:mm:sss') + ''''
 		IF @val_user_type_id = 'datetimeoffset'
 			SET @ExecCmd = @ExecCmd + '''' + FORMAT(DATETIMEOFFSETFROMPARTS(
